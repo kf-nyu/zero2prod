@@ -1,8 +1,9 @@
 //! main.rs
 //! use actix_web::{web, App, HttpRequest, HttpResponse, HttpServer, Responder};
+use sqlx::PgPool;
 use std::net::TcpListener;
-use zero2prod::run;
-
+use zero2prod::configuration::get_configuration;
+use zero2prod::startup::run;
 // async fn health_check(req: HttpRequest) -> impl Responder {
 //;async fn health_check() -> impl Responder {
 //let name = req.match_info().get("name").unwrap_or("world");
@@ -14,14 +15,13 @@ use zero2prod::run;
 
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
-    //    HttpServer::new(|| {
-    //       App::new()
-    //            .route("/", web::get().to(greet))
-    //            .route("/{name}", web::get().to(greet))
-    //            .route("/health_check", web::get().to(health_check))
-    //    })
-    //    .bind("127.0.0.1:8000")?
-    //    .run()
-    let listener = TcpListener::bind("127.0.0.1:8000")?;
-    run(listener)?.await
+    //Panic if we can't read configuration
+    let configuration = get_configuration().expect("Failed to read configuration.");
+    let connection_pool = PgPool::connect(&configuration.database.connection_string())
+        .await
+        .expect("Failed to connect to Postgres.");
+    // We have removed the hard-coded '8000' - it's now coming from our settings!
+    let address = format!("127.0.0.1:{}", configuration.application_port);
+    let listener = TcpListener::bind(address)?;
+    run(listener, connection_pool)?.await
 }
