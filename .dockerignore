@@ -1,0 +1,9 @@
+target/
+tests/
+Dockerfile
+scripts/
+migrations/
+.git
+.DS_Store
+.env
+*.log

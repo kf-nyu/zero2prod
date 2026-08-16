@@ -1,0 +1,11 @@
+#! configuration/production.yaml
+application:
+  host: 0.0.0.0
+
+database:
+  host: "postgres"
+  port: 5432
+  username: "app"
+  password: "secret"
+  database_name: "newsletter"
+  require_ssl: true
