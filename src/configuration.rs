@@ -28,8 +28,7 @@ pub struct DatabaseSettings {
 }
 
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
-    let base_path = std::env::current_dir()
-        .expect("Failed to determine the current directly");
+    let base_path = std::env::current_dir().expect("Failed to determine the current directly");
     let configuration_directory = base_path.join("configuration");
 
     // Detect the running environment.
@@ -42,19 +41,19 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     // Initialize our configuration reader
     let settings = config::Config::builder()
         // Add configuration values from a file named 'configuration.yaml'
-        .add_source(
-            config::File::from(configuration_directory.join("base.yaml"))
-        )
-        .add_source(
-            config::File::from(configuration_directory.join(environment_filename))
-        )
-        // Add in settings from environment variables (with a prefix of APP and 
+        .add_source(config::File::from(
+            configuration_directory.join("base.yaml"),
+        ))
+        .add_source(config::File::from(
+            configuration_directory.join(environment_filename),
+        ))
+        // Add in settings from environment variables (with a prefix of APP and
         // '__' as separator)
         // E.g. [APP_APPLICATION_PORT=5001 would set 'Settings.application.port'
         .add_source(
             config::Environment::with_prefix("APP")
                 .prefix_separator("_")
-                .separator("__")
+                .separator("__"),
         )
         .build()?;
     // Try to convert the configuration values it read into
@@ -85,9 +84,9 @@ impl TryFrom<String> for Environment {
             "local" => Ok(Self::Local),
             "production" => Ok(Self::Production),
             other => Err(format!(
-                    "{} is not a supported environment. \
+                "{} is not a supported environment. \
                     Use either 'local' or 'production'.",
-                    other
+                other
             )),
         }
     }
@@ -109,6 +108,5 @@ impl DatabaseSettings {
             .port(self.port)
             .ssl_mode(ssl_mode)
             .database(&self.database_name)
-
     }
 }
